@@ -59,24 +59,24 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Filters the local listing data by size and inclusive price ceiling, then ranks keyword matches to the description.
+- **Inputs:** `description` (`str`); `size` (`str | None`, default `None`); `max_price` (`float | None`, default `None`). A letter size matches a whole segment, so `M` matches `S/M` but `L` does not match `XL`. Numeric US shoe and waist sizes must match the full number.
+- **Returns:** A `list[dict]` of at most `config.SEARCH_RESULT_LIMIT` complete listing records, best keyword match first. Each record contains `id`, `title`, `description`, `category`, `style_tags`, `size`, `condition`, `price`, `colors`, `brand`, and `platform`.
+- **When it has nothing:** Returns `[]`, including when every listing fails a filter or no remaining listing shares a meaningful keyword.
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Uses the model to suggest an outfit that includes a found item and pieces in the user's wardrobe.
+- **Inputs:** `new_item` (`dict`, a complete listing record); `wardrobe` (`dict` with an `items: list[dict]` field containing wardrobe records).
+- **Returns:** A nonempty `str` with one or two outfit ideas naming owned pieces when available.
+- **When it has nothing:** For `wardrobe["items"] == []`, returns general styling advice for the item. If the model returns empty text, returns a short general suggestion.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Uses the model to write a short, postable caption for the outfit and thrift find.
+- **Inputs:** `outfit` (`str`, the outfit suggestion); `new_item` (`dict`, the selected listing record).
+- **Returns:** A `str` caption of two to four sentences that names the item, price, platform, and outfit vibe.
+- **When it has nothing:** A blank `outfit` returns an explanatory string without calling the model; an empty model response returns a retry message.
 
 ---
 
@@ -93,13 +93,13 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** If `search_listings` returns `[]`, save a message suggesting a broader description, a different size, or a higher price ceiling in `session["error"]` and stop before `suggest_outfit`. Otherwise save the first listing as `selected_item`, use it in `suggest_outfit`, then pass the saved outfit and item to `create_fit_card`.
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+**How the query is parsed:** Regular expressions extract an explicit size and an `under`/`below` price ceiling; the remaining words become the search description. This parsing uses no model call.
 
-**What moves through the session:** <!-- which fields, in what order -->
+**What moves through the session:** `parsed` → `search_results` → `selected_item` → `outfit_suggestion` → `fit_card`. Each tool's result is saved before the next tool reads it.
 
 ---
 
