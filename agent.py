@@ -13,6 +13,8 @@ Build and test your three tools in `tools.py` first. Then come here.
     python agent.py          runs both example paths below
 """
 
+import re
+
 import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
@@ -48,6 +50,37 @@ def new_session(query: str, wardrobe: dict) -> dict:
 
 
 # ── planning loop ─────────────────────────────────────────────────────────────
+
+_PRICE_PATTERN = re.compile(
+    r"\b(?:under|below)\s+\$?\s*(\d+(?:\.\d{1,2})?)\b", re.IGNORECASE
+)
+_SIZE_PATTERN = re.compile(
+    r"\b(?:in\s+)?size\s+"
+    r"(US\s*\d+(?:\.\d+)?|[WL]\d+|"
+    r"(?:XXXL|XXL|XXS|XL|XS|S|M|L)(?:/(?:XXXL|XXL|XXS|XL|XS|S|M|L))?|"
+    r"\d+(?:\.\d+)?)\b",
+    re.IGNORECASE,
+)
+
+
+def _parse_query(query: str) -> dict:
+    """Extract explicit filters and leave the remaining search words."""
+    price_match = _PRICE_PATTERN.search(query)
+    max_price = float(price_match.group(1)) if price_match else None
+    without_price = _PRICE_PATTERN.sub(" ", query, count=1)
+
+    size_match = _SIZE_PATTERN.search(without_price)
+    size = size_match.group(1).upper().replace(" ", "") if size_match else None
+    without_filters = _SIZE_PATTERN.sub(" ", without_price, count=1)
+
+    description = re.sub(r"\s+", " ", without_filters).strip(" ,.-")
+    description = re.sub(
+        r"^(?:i(?:'m| am)\s+)?(?:looking for|want|need)\s+(?:a|an|some)?\s*",
+        "",
+        description,
+        flags=re.IGNORECASE,
+    ).strip(" ,.-")
+    return {"description": description, "size": size, "max_price": max_price}
 
 def run_agent(query: str, wardrobe: dict) -> dict:
     """
@@ -106,9 +139,38 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         than a stack trace. The import is already at the top of this file.
     """
     session = new_session(query, wardrobe)
+    session["parsed"] = _parse_query(query)
+    next_step = "search"
+    iterations = 0
 
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
+    while next_step is not None:
+        iterations += 1
+        trace.check_iterations(iterations)
+
+        if next_step == "search":
+            parsed = session["parsed"]
+            session["search_results"] = search_listings(
+                parsed["description"], parsed["size"], parsed["max_price"]
+            )
+            if not session["search_results"]:
+                session["error"] = (
+                    "No listings matched. Try a broader description, "
+                    "a different size, or a higher price ceiling."
+                )
+                return session
+            session["selected_item"] = session["search_results"][0]
+            next_step = "outfit"
+        elif next_step == "outfit":
+            session["outfit_suggestion"] = suggest_outfit(
+                session["selected_item"], session["wardrobe"]
+            )
+            next_step = "fit_card"
+        elif next_step == "fit_card":
+            session["fit_card"] = create_fit_card(
+                session["outfit_suggestion"], session["selected_item"]
+            )
+            next_step = None
+
     return session
 
 
