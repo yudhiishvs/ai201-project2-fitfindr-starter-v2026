@@ -164,15 +164,15 @@ Found this sick Graphic Tee — 2003 Tour Bootleg Style on depop for just $24. S
 
 **Moment 1**
 
-- *What I asked for:* I asked the model to describe exactly how someone would test each of my five acceptance criteria, without rewriting them.
-- *What came back:* It found missing details for recording the item passed into `suggest_outfit` and ambiguity about which listings and price format count for the fit-card target.
-- *What I changed:* I added a recording-wrapper procedure for state, named five listing IDs for the card check, and specified accepted dollar formatting and sentence endings before implementing the tools.
+- *What I asked for:* I asked an AI assistant to draft criteria 3–5 from the assignment, then asked a model to describe exactly how someone would test all five without rewriting them.
+- *What came back:* The draft covered state handoff, fit-card facts, and size and price filters. The critique found missing details for recording the item passed into `suggest_outfit` and ambiguity about the card's listings and price format.
+- *What I changed:* The final criteria include a recording-wrapper procedure for state, five named listing IDs for the card check, and explicit dollar formatting and sentence endings. These were set before implementing the tools.
 
 **Moment 2**
 
-- *What I asked for:* I asked an AI assistant to build `search_listings` and the planning loop from the starter contracts.
-- *What came back:* It proposed keyword-ranked results and a loop that chooses its next tool from the saved result. The starter warned that substring size checks would confuse `S` with `US 9` and `L` with `XL`.
-- *What I changed:* I used exact size segments, saved each tool result before the next call, and added tests for size collisions, state handoff, and the empty-search stop.
+- *What I asked for:* I asked the assistant to implement `search_listings` and the planning loop from the starter contracts.
+- *What came back:* It produced keyword-ranked results and a loop that chooses its next tool from the saved result. The starter warned that substring size checks would confuse `S` with `US 9` and `L` with `XL`.
+- *What I changed:* The final implementation uses exact size segments and includes tests for size collisions, state handoff, and the empty-search stop.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
