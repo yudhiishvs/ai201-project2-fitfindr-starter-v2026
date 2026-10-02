@@ -25,9 +25,12 @@ Given a query that matches at least one listing, the agent completes all three
 tool calls and returns a fit card — in at least 4 of 5 tries.
 
 **Why this target:**
-<!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
-     "my search is a plain keyword match and some phrasings will miss" is a
-     real answer. -->
+Search uses keyword overlap rather than semantic search, so one phrasing may
+rank poorly or miss. The two model calls can also fail or return weak text; four
+successful runs still sets a meaningful reliability target.
+
+**Test setup:** Use `vintage graphic tee under $30` and record calls to the
+three tool functions while running the agent five times.
 
 ---
 
@@ -37,66 +40,59 @@ Given a query that matches no listings, the agent stops before calling
 `suggest_outfit` and returns a message naming what to change — 5 of 5 tries.
 
 **Why this target:**
-<!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
-     about this path? -->
+This path uses a deterministic empty-list check and makes no model calls after
+search. It should stop correctly every time, and the message should tell the
+user to broaden the description, change the size, or raise the price ceiling.
+
+**Test setup:** Use `designer ballgown size XXS under $5` and record whether
+`suggest_outfit` is called on each of five runs.
 
 ---
 
-## 3. Something about state
+## 3. The selected listing reaches the outfit tool unchanged
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know that the item your search found is the same item the
-     next tool received? Name something countable or observable.
-
-     This is the criterion people find hardest, because state failure doesn't
-     look like state failure — it looks like a tool problem. Something that
-     compares session["selected_item"] against what actually reached
-     suggest_outfit is the shape you're after. -->
-
-
+In five runs of `vintage graphic tee under $30`, record the `new_item["id"]`
+argument with a wrapper around `agent.suggest_outfit`. That ID must equal both
+`session["search_results"][0]["id"]` and
+`session["selected_item"]["id"]` — 5 of 5 runs.
 
 **Why this target:**
-
-
+The loop copies a selected listing through session state without a model
+transformation, so there is no useful reason to allow an item mismatch.
 
 ---
 
-## 4. Something about the fit card
+## 4. The fit card keeps its facts while the wording varies
 
-<!-- YOU WRITE THIS ONE.
-
-     The fit card calls a model, so the same input can produce different words
-     each time. That's not a bug — it's the nature of the tool. So what would
-     make it acceptable?
-
-     Think about what you'd actually be unhappy to see. A caption that never
-     mentions the price? Two different items producing the same opening
-     sentence? A card longer than a caption anyone would post? Any of those can
-     be turned into a number. -->
-
-
+For listings `lst_004`, `lst_006`, `lst_007`, `lst_013`, and `lst_019`, call
+`suggest_outfit` with the example wardrobe and pass its nonempty result to
+`create_fit_card`. At least 4 of 5 cards must have two to four sentences
+(counting `.`, `!`, and `?` followed by whitespace or end of text as endings)
+and contain the item's exact title,
+price formatted as `$24` or `$24.00` for a `24.0` price, and platform name
+case-insensitively, each exactly once.
 
 **Why this target:**
-
-
+The model can vary its wording, but those three facts must remain grounded in
+the selected listing. Four of five is demanding without treating one model
+formatting miss as a total failure.
 
 ---
 
-## 5. Your choice
+## 5. Size and price filters are reliable
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. Speed, the empty
-     wardrobe path, what happens when the model can't be reached, whether the
-     search respects a price ceiling — anything, as long as it names a number
-     or an observable outcome. -->
-
-
+For each of these five queries, search returns at least one listing and every
+returned listing's `price` field is at or below the stated cap, and its `size`
+field contains the requested letter size as a whole slash-delimited segment
+or equals the requested US shoe size exactly (so `US 8.5` fails `size 8`) —
+5 of 5 queries: `graphic tee size L under $25`, `track jacket size M under
+$50`, `platform sneakers size 8 under $50`, `denim jacket size S under $50`,
+and `silk slip dress size M under $40`.
 
 **Why this target:**
-
-
+Size and price are explicit structured filters over local data. A wrong size
+or an over-budget suggestion wastes the user's time, and there is no model
+variability in this part of the system.
 
 ---
 
