@@ -13,8 +13,8 @@
 > python app.py ask 'vintage graphic tee under $30'
 > ```
 >
-> All three tools are stubs, so that last command will do nothing useful yet.
-> That's the starting position.
+> The command prints a matching item, an outfit idea, and a fit card. An
+> impossible query prints a suggestion for changing the search.
 >
 > **The rest of this file is your submission.** Fill it in as you go.
 
@@ -39,9 +39,11 @@
 
 ## What This Does
 
-<!-- Three or four sentences: what a user asks for, and what they get back. -->
-
-
+FitFindr accepts a plain-language request for a thrift item, including an
+optional size and price ceiling. It searches local listings and chooses the
+strongest matching item within those filters. It uses the user's wardrobe, or
+an empty wardrobe, to suggest an outfit and write a short fit card caption.
+When nothing matches, it stops and suggests ways to revise the search.
 
 ---
 
@@ -113,25 +115,40 @@
 **One full query**
 
 ```
-$ python app.py ask '...'
+$ .venv/bin/python app.py ask 'vintage graphic tee under $30'
+  Found:    Graphic Tee — 2003 Tour Bootleg Style — $24.0 on depop
 
+  Outfit:   Pair the Graphic Tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for a classic grunge look. Alternatively, layer the vintage black denim jacket over the Graphic Tee, paired with wide-leg khaki trousers, chunky white sneakers, and the brown leather belt.
+
+  Fit card: Scored this awesome Graphic Tee — 2003 Tour Bootleg Style on depop for just $24. Pair it with baggy jeans and combat boots for a classic grunge look. Grab it before it's gone!
+
+1 model calls this session, 1 served from cache, 169 prompt + 47 output tokens
+```
+
+The empty-search branch used no model calls:
+
+```
+$ .venv/bin/python app.py ask 'designer ballgown size XXS under $5'
+  No listings matched. Try a broader description, a different size, or a higher price ceiling.
+
+0 model calls this session
 ```
 
 **The three tools, tested one at a time**
 
 ```
-$ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
-
+$ .venv/bin/python -c "from tools import search_listings; print([(item['id'], item['title'], item['size'], item['price']) for item in search_listings('graphic tee', size='L', max_price=30)])"
+[('lst_006', 'Graphic Tee — 2003 Tour Bootleg Style', 'L', 24.0), ('lst_033', 'Vintage Band Tee — Faded Grey', 'L', 19.0), ('lst_015', 'Vintage Graphic Hoodie — Faded Black', 'L', 26.0)]
 ```
 
 ```
-$ python -c "from tools import suggest_outfit; ..."
-
+$ .venv/bin/python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[5], get_example_wardrobe()))"
+Pair the Graphic Tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for a classic grunge look. Alternatively, layer the vintage black denim jacket over the Graphic Tee, paired with wide-leg khaki trousers, chunky white sneakers, and the brown leather belt.
 ```
 
 ```
-$ python -c "from tools import create_fit_card; ..."
-
+$ .venv/bin/python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('Baggy straight-leg jeans, black combat boots, and a black crossbody bag', load_listings()[5]))"
+Found this sick Graphic Tee — 2003 Tour Bootleg Style on depop for just $24. Style it with baggy straight-leg jeans, black combat boots, and a black crossbody bag for the ultimate grunge streetwear look. Grab it before it’s gone!
 ```
 
 ---
@@ -147,15 +164,15 @@ $ python -c "from tools import create_fit_card; ..."
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked the model to describe exactly how someone would test each of my five acceptance criteria, without rewriting them.
+- *What came back:* It found missing details for recording the item passed into `suggest_outfit` and ambiguity about which listings and price format count for the fit-card target.
+- *What I changed:* I added a recording-wrapper procedure for state, named five listing IDs for the card check, and specified accepted dollar formatting and sentence endings before implementing the tools.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked an AI assistant to build `search_listings` and the planning loop from the starter contracts.
+- *What came back:* It proposed keyword-ranked results and a loop that chooses its next tool from the saved result. The starter warned that substring size checks would confuse `S` with `US 9` and `L` with `XL`.
+- *What I changed:* I used exact size segments, saved each tool result before the next call, and added tests for size collisions, state handoff, and the empty-search stop.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 

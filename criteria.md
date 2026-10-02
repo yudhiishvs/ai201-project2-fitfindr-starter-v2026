@@ -15,7 +15,8 @@ data earns credit; *"80% seemed reasonable"* does not.
 > Missing your own targets next unit costs you nothing. Setting a target so
 > easy you can't miss it does.
 
-**Two are written for you. You write three.**
+The course supplied the first two targets; the other three cover state,
+caption quality, and filter accuracy.
 
 ---
 
@@ -27,7 +28,7 @@ tool calls and returns a fit card — in at least 4 of 5 tries.
 **Why this target:**
 Search uses keyword overlap rather than semantic search, so one phrasing may
 rank poorly or miss. The two model calls can also fail or return weak text; four
-successful runs still sets a meaningful reliability target.
+successful runs still set a meaningful reliability target.
 
 **Test setup:** Use `vintage graphic tee under $30` and record calls to the
 three tool functions while running the agent five times.
@@ -68,8 +69,8 @@ For listings `lst_004`, `lst_006`, `lst_007`, `lst_013`, and `lst_019`, call
 `suggest_outfit` with the example wardrobe and pass its nonempty result to
 `create_fit_card`. At least 4 of 5 cards must have two to four sentences
 (counting `.`, `!`, and `?` followed by whitespace or end of text as endings)
-and contain the item's exact title,
-price formatted as `$24` or `$24.00` for a `24.0` price, and platform name
+and contain the item's exact title, a `$` followed by its numeric `price`
+(optionally with `.00` for a whole-dollar price), and its platform name
 case-insensitively, each exactly once.
 
 **Why this target:**
@@ -83,8 +84,9 @@ formatting miss as a total failure.
 
 For each of these five queries, search returns at least one listing and every
 returned listing's `price` field is at or below the stated cap, and its `size`
-field contains the requested letter size as a whole slash-delimited segment
-or equals the requested US shoe size exactly (so `US 8.5` fails `size 8`) —
+field contains the requested letter size as a whole token (including tokens
+separated by `/`) or equals the requested US shoe size exactly (so `US 8.5`
+fails `size 8`) —
 5 of 5 queries: `graphic tee size L under $25`, `track jacket size M under
 $50`, `platform sneakers size 8 under $50`, `denim jacket size S under $50`,
 and `silk slip dress size M under $40`.
