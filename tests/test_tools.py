@@ -94,6 +94,7 @@ class ModelToolTests(unittest.TestCase):
         self.assertIn("$24", prompts[0])
         self.assertIn("depop", prompts[0])
         self.assertIn("dark wash jeans and white sneakers", prompts[0])
+        self.assertIn("Start the first sentence with the exact title", prompts[0])
 
     def test_blank_outfit_returns_a_message_without_calling_the_model(self):
         with patch("tools.generate") as model:

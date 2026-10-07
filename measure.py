@@ -25,7 +25,7 @@ TARGETS = {1: 4, 2: 5, 3: 5, 4: 4, 5: 5}
 def card_checks(card, item):
     sentence_count = len(re.findall(r"[.!?](?=\s|$)", card))
     title_count = card.casefold().count(item["title"].casefold())
-    price = re.compile(r"\$" + re.escape(f"{item['price']:g}") + r"(?:\.00)?(?!\d)")
+    price = re.compile(r"\$" + re.escape(f"{item['price']:g}") + r"(?:\.00)?(?!\d|\.\d)")
     price_count = len(price.findall(card))
     platform_count = len(re.findall(r"\b" + re.escape(item["platform"]) + r"\b", card, re.I))
     return {

@@ -225,7 +225,8 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         f"Outfit idea: {outfit}\n"
         f"Style tags: {', '.join(new_item['style_tags'])}\n\n"
         "Write a caption someone would actually post. Use two to four short "
-        "sentences. Include the exact title, price, and platform once each. "
+        "sentences. Start the first sentence with the exact title shown above, "
+        "with every word in the same order. Include the price and platform once each. "
         "Describe the outfit vibe using the given idea. Do not invent a brand "
         "or any details missing from the listing."
     )

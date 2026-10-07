@@ -174,178 +174,116 @@ Found this sick Graphic Tee — 2003 Tour Bootleg Style on depop for just $24. S
 - *What came back:* It produced keyword-ranked results and a loop that chooses its next tool from the saved result. The starter warned that substring size checks would confuse `S` with `US 9` and `L` with `XL`.
 - *What I changed:* The final implementation uses exact size segments and includes tests for size collisions, state handoff, and the empty-search stop.
 
-<!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
+**Moment 3**
 
-     Don't fill these in during unit 3.
-     ═══════════════════════════════════════════════════════════════════ -->
+- *What I asked for* I used an assistant to wire the search through MCP and set up the five criterion runs.
+- *What came back* The first five runs showed two fit cards that shortened or reordered the exact listing title.
+- *What I changed* I kept the original targets, changed only the fit card prompt, and ran the same checks again. The raw runs are saved in `results/`.
 
 ---
 
-## Run Log — Before
+## Run Log Before
 
-<!-- Five criteria, five tries each, in this exact format.
-
-     Five, because your criteria are written out of five. Mark each try PASS
-     or FAIL, count the passes, and read that count against your target — a
-     row targeting 4 of 5 with three PASS cells is MISSED (3/5).
-
-     `python run_eval.py --label before` runs everything and writes the table
-     into results/. Paste it here and fill in the verdicts. -->
+The cache was off. The five tries for criteria 1 and 3 are the same five agent runs because both criteria inspect that run. Criterion 4 uses the five listing IDs named in `criteria.md`. Criterion 5 uses its five named queries. The complete records are in [results/before.md](results/before.md).
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Full three tool run | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Empty search stop | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Selected item handoff | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card facts | 4 of 5 | PASS | FAIL | PASS | FAIL | PASS | MISSED (3/5) |
+| 5. Size and price filters | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
-**Real output from one try**, pasted as text, naming the file and function
-that produced it:
-
-```
+Output from `measure.py` and the functions it calls is shown below. These are recorded values from one try of each criterion.
 
 ```
+Criterion 1  agent.run_agent
+Selected lst_006
+Fit card Scored this vintage Graphic Tee — 2003 Tour Bootleg Style on Depop for just $24. Pair it with baggy straight-leg jeans and combat boots for an effortless grunge look. Grab it before it’s gone!
 
----
+#graphictee #vintage #grunge #streetwear #bandtee
+
+Criterion 2  agent.run_agent
+No listings matched. Try a broader description, a different size, or a higher price ceiling.
+Outfit calls 0
+
+Criterion 3  agent.run_agent and recorded suggest_outfit argument
+Search item lst_006
+Selected item lst_006
+Outfit argument lst_006
+
+Criterion 4  tools.suggest_outfit then tools.create_fit_card
+Item lst_006
+Fit card Scored this 2003 Tour Bootleg Style Graphic Tee on Depop for just $24! Style it with baggy straight-leg jeans and black combat boots for an effortless grunge look. Grab this piece of streetwear before it's gone.
+Exact title occurrences 0
+
+Criterion 5  agent._parse_query then tools.search_listings
+Query graphic tee size L under $25
+Returned lst_006 size L price $24, lst_033 size L price $19
+```
 
 ## Verdicts and Diagnoses
 
-<!-- MET or MISSED per criterion against LAST UNIT's target, plus a sentence on
-     how you decided.
+| Criterion | Target | Verdict | How I decided |
+|---|---|---|---|
+| 1. Full three tool run | 4 of 5 | MET 5 of 5 | Each trace shows the MCP search, outfit tool, and card tool in order, followed by a nonempty card. |
+| 2. Empty search stop | 5 of 5 | MET 5 of 5 | Each search returned an empty list, the outfit tool was never called, and the message named ways to change the query. |
+| 3. Selected item handoff | 5 of 5 | MET 5 of 5 | The recorded outfit argument ID matched the first search result and selected session item every time. |
+| 4. Fit card facts | 4 of 5 | MISSED 3 of 5 | Two cards had zero occurrences of the exact listing title. The other required facts and sentence counts passed. |
+| 5. Size and price filters | 5 of 5 | MET 5 of 5 | Every query returned at least one item and every returned size and price met the parsed limits. |
 
-     Then, for every miss: which of the four places it happened — a tool, the
-     loop's branch, the session, or the model's output — AND the mechanism.
-
-     Not a diagnosis:  "The fit card was bad."
-     A diagnosis:      "The fit card criterion missed on 2 of 5 items. Both had
-                        an empty brand field. My prompt puts the brand in the
-                        first sentence, so the card opened with a blank and read
-                        like a fragment. The tool worked; the prompt assumed a
-                        field that isn't always there."
-
-     Look for a pattern. Three misses on the same tool is one problem, not
-     three. -->
-
-| # | Criterion | Target | Verdict | How I decided |
-|---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
-
-**Diagnoses**
-
-
-
----
+The miss was in the `create_fit_card` model output. For `lst_006`, it reordered the title words. For `lst_013`, it omitted part of the title. The prompt asked for the exact title but left the model free to start with a paraphrase. The search, session handoff, and outfit step were intact in both cases.
 
 ## Loop Trace
 
-<!-- One full run, printed step by step, with the MCP call visible in it.
-
-     `python app.py ask '...' --trace` once you've added the trace.step()
-     calls in Milestone 2.
-
-     Worth pasting BOTH the happy path and the empty-search path. The empty
-     one should be visibly shorter, because it stops. If your two traces are
-     the same length, your branch isn't working — and this is the fastest way
-     anyone will ever find that out. -->
-
-**Happy path**
+The first trace is one complete run from `agent.run_agent` recorded by `trace.step`. The search call went through MCP.
 
 ```
-
+[1] search_listings (via MCP)
+      in:  {"description": "vintage graphic tee", "size": "None", "max_price": "30.0"}
+      out: 10 listings [{"id": "lst_006", "title": "Graphic Tee — 2003 Tour Bootleg Style"}, {"id": "lst_033", "title": "Vintage Band Tee — Faded Grey"}, {"id": "lst_015", "title": "Vintage Graphic Hoodie — Faded Black"}, {"id": "lst_002", "title": "Y2K Baby Tee — Butterfly Print"}, {"id": "lst_012", "title": "Oversized Crewneck Sweatshirt — Vintage Navy"}, {"id": "lst_030", "title": "Vintage Knit Vest — Argyle Brown/Cream"}, {"id": "lst_024", "title": "Vintage Polo Shirt — Forest Green"}, {"id": "lst_003", "title": "Oversized Flannel Shirt — Plaid Red/Black"}, {"id": "lst_013", "title": "90s Silk Slip Dress — Floral, Midi Length"}, {"id": "lst_014", "title": "Leather Belt — Brown, Braided"}]
+[2] suggest_outfit
+      in:  {"new_item": "{\"id\": \"lst_006\", \"title\": \"Graphic Tee — 2003 Tour Bootleg Style\", \"price\": 24.0, \"platform\": \"depop\"}", "wardrobe": "{\"items\": \"10 items: {'id': 'w_001', 'name': 'Baggy straight-leg jeans, dark wash…\"}"}
+      out: Pair the Graphic Tee with your Baggy straight-leg jeans, dark wash and Black combat boots for an effortless gr…
+[3] create_fit_card
+      in:  {"outfit": "Pair the Graphic Tee with your Baggy straight-leg jeans, dark wash and Black combat boots for an effortless gr…", "new_item": "{\"id\": \"lst_006\", \"title\": \"Graphic Tee — 2003 Tour Bootleg Style\", \"price\": 24.0, \"platform\": \"depop\"}"}
+      out: Scored this vintage Graphic Tee — 2003 Tour Bootleg Style on Depop for just $24. Pair it with baggy straight-l…
 ```
 
-**Empty search**
+The impossible query stopped after search.
 
 ```
-
+[1] search_listings (via MCP)
+      in:  {"description": "designer ballgown", "size": "XXS", "max_price": "5.0"}
+      out: [] (empty)
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
+The server registered `search_listings` with the same input names and types as the tool inventory. `agent.run_agent` now calls it through `mcp_client.call_tool`. A direct search and an MCP search returned equal listing records for the same test query. The two model tools stayed local.
 
-
-
----
+I triggered the three required failure cases. An impossible query said "No listings matched. Try a broader description, a different size, or a higher price ceiling." An empty wardrobe returned an outfit suggestion starting with "Here are two ways to style your new Light Wash, Cropped Denim Jacket" and then a fit card. A temporary invalid key produced "The model could not be reached for an outfit suggestion. Check your connection and try again." The saved key was not changed.
 
 ## The Improvement
 
-<!-- What you changed, why your diagnosis pointed at it, and the after-run in
-     the same table format. One change, measured properly.
+I changed one prompt in `tools.create_fit_card` to tell the model to start its first sentence with the complete listing title in the original word order. The baseline miss pointed to title paraphrasing, so this change targeted that step. No listing data, filter, branch, or target changed.
 
-     `python run_eval.py --label after` -->
+### Run Log After
 
-**What I changed:**
-
-**Which failure it was meant to fix:**
-
-### Run Log — After
+The complete records are in [results/after.md](results/after.md).
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Full three tool run | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Empty search stop | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Selected item handoff | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card facts | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. Size and price filters | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
-**Did it help, and how do I know:**
-
-<!-- If it made things worse, say that. Honestly reported, that earns full
-     credit and is more interesting than one that worked. -->
-
-
-
----
+The fit card check rose from 3 of 5 to 5 of 5. The other four counts stayed at 5 of 5. The after cards for `lst_006` and `lst_013` contained their full titles once each. Five tries show this run met the target, not that every future model response will.
 
 ## What's Still Broken
 
-<!-- For each criterion still missed: what you'd do, and why you stopped where
-     you did. "I ran out of time" is fine if it's true. Pretending nothing is
-     left is not. -->
-
-
-
-<!-- ═════════════════════════════════════════════════════════════════════
-
-     SUBMISSION CHECKLIST — unit 3
-
-       [ ] criteria.md has five numbered criteria, each with a target
-       [ ] Each criterion has a reason underneath it
-       [ ] All five unit 3 sections above have real content
-       [ ] Tool Inventory: all three tools, inputs WITH TYPES, a specific
-           return value, and the empty case
-       [ ] Planning Loop names the branch rule and agent.py::run_agent
-       [ ] Sample Run: one full query plus the three per-tool tests, as text
-       [ ] At least four new commits
-       [ ] Repository URL submitted — WRITE IT DOWN, you submit the same one
-           next unit
-
-     SUBMISSION CHECKLIST — unit 4
-
-       [ ] mcp_server.py exists with one tool registered
-           (or a written record of exactly where the rewire broke)
-       [ ] Run Log — Before, five criteria, five tries each
-       [ ] Real output pasted underneath, naming file and function
-       [ ] A verdict on every criterion
-       [ ] A diagnosis for every miss, naming a place AND a mechanism
-       [ ] Loop Trace, with the MCP call visible in it
-       [ ] All three failure modes triggered and handled
-       [ ] One improvement, with Run Log — After in the same format
-       [ ] What's Still Broken
-       [ ] At least four new commits
-       [ ] The SAME repository URL as last unit
-
-     Do not delete and recreate this repository. Your commit history is what
-     shows your criteria existed before your results did.
-     ═════════════════════════════════════════════════════════════════════ -->
+None of the five criteria missed in the after run. The model can still vary its wording, so the exact title check is worth repeating on later runs. The unavailable model message names a connection check and retry, while search and the saved key remain available for another attempt.
 
 ---
 
-📖 **How to run this project: [RUNNING.md](RUNNING.md)**
+[How to run this project](RUNNING.md)
