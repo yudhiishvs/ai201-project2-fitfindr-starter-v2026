@@ -1,0 +1,403 @@
+# Before run log
+
+Five tries per criterion with the cache off.
+
+| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
+|---|---|---|---|---|---|---|---|
+| 1. Full run | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Empty search | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Item handoff | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card facts | 4 of 5 | PASS | FAIL | PASS | FAIL | PASS | MISSED (3/5) |
+| 5. Size and price | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+
+## Recorded output
+
+### Criterion 1
+
+Try 1
+
+```json
+{
+  "passed": true,
+  "selected_id": "lst_006",
+  "fit_card": "Scored this vintage Graphic Tee — 2003 Tour Bootleg Style on Depop for just $24. Pair it with baggy straight-leg jeans and combat boots for an effortless grunge look. Grab it before it’s gone! \n\n#graphictee #vintage #grunge #streetwear #bandtee",
+  "error": null,
+  "calls": [
+    "search_listings (via MCP)",
+    "suggest_outfit",
+    "create_fit_card"
+  ],
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"vintage graphic tee\", \"size\": \"None\", \"max_price\": \"30.0\"}\n      out: 10 listings [{\"id\": \"lst_006\", \"title\": \"Graphic Tee — 2003 Tour Bootleg Style\"}, {\"id\": \"lst_033\", \"title\": \"Vintage Band Tee — Faded Grey\"}, {\"id\": \"lst_015\", \"title\": \"Vintage Graphic Hoodie — Faded Black\"}, {\"id\": \"lst_002\", \"title\": \"Y2K Baby Tee — Butterfly Print\"}, {\"id\": \"lst_012\", \"title\": \"Oversized Crewneck Sweatshirt — Vintage Navy\"}, {\"id\": \"lst_030\", \"title\": \"Vintage Knit Vest — Argyle Brown/Cream\"}, {\"id\": \"lst_024\", \"title\": \"Vintage Polo Shirt — Forest Green\"}, {\"id\": \"lst_003\", \"title\": \"Oversized Flannel Shirt — Plaid Red/Black\"}, {\"id\": \"lst_013\", \"title\": \"90s Silk Slip Dress — Floral, Midi Length\"}, {\"id\": \"lst_014\", \"title\": \"Leather Belt — Brown, Braided\"}]\n[2] suggest_outfit\n      in:  {\"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\", \"wardrobe\": \"{\\\"items\\\": \\\"10 items: {'id': 'w_001', 'name': 'Baggy straight-leg jeans, dark wash…\\\"}\"}\n      out: Pair the Graphic Tee with your Baggy straight-leg jeans, dark wash and Black combat boots for an effortless gr…\n[3] create_fit_card\n      in:  {\"outfit\": \"Pair the Graphic Tee with your Baggy straight-leg jeans, dark wash and Black combat boots for an effortless gr…\", \"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\"}\n      out: Scored this vintage Graphic Tee — 2003 Tour Bootleg Style on Depop for just $24. Pair it with baggy straight-l…"
+}
+```
+
+Try 2
+
+```json
+{
+  "passed": true,
+  "selected_id": "lst_006",
+  "fit_card": "Channel your inner grunge with this Graphic Tee — 2003 Tour Bootleg Style, styled casually with baggy jeans and combat boots. It’s listed on depop for just $24. Grab it now to complete your streetwear rotation! #graphictee #vintage #grunge #streetwear #bandtee",
+  "error": null,
+  "calls": [
+    "search_listings (via MCP)",
+    "suggest_outfit",
+    "create_fit_card"
+  ],
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"vintage graphic tee\", \"size\": \"None\", \"max_price\": \"30.0\"}\n      out: 10 listings [{\"id\": \"lst_006\", \"title\": \"Graphic Tee — 2003 Tour Bootleg Style\"}, {\"id\": \"lst_033\", \"title\": \"Vintage Band Tee — Faded Grey\"}, {\"id\": \"lst_015\", \"title\": \"Vintage Graphic Hoodie — Faded Black\"}, {\"id\": \"lst_002\", \"title\": \"Y2K Baby Tee — Butterfly Print\"}, {\"id\": \"lst_012\", \"title\": \"Oversized Crewneck Sweatshirt — Vintage Navy\"}, {\"id\": \"lst_030\", \"title\": \"Vintage Knit Vest — Argyle Brown/Cream\"}, {\"id\": \"lst_024\", \"title\": \"Vintage Polo Shirt — Forest Green\"}, {\"id\": \"lst_003\", \"title\": \"Oversized Flannel Shirt — Plaid Red/Black\"}, {\"id\": \"lst_013\", \"title\": \"90s Silk Slip Dress — Floral, Midi Length\"}, {\"id\": \"lst_014\", \"title\": \"Leather Belt — Brown, Braided\"}]\n[2] suggest_outfit\n      in:  {\"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\", \"wardrobe\": \"{\\\"items\\\": \\\"10 items: {'id': 'w_001', 'name': 'Baggy straight-leg jeans, dark wash…\\\"}\"}\n      out: Pair the graphic tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for an eff…\n[3] create_fit_card\n      in:  {\"outfit\": \"Pair the graphic tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for an eff…\", \"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\"}\n      out: Channel your inner grunge with this Graphic Tee — 2003 Tour Bootleg Style, styled casually with baggy jeans an…"
+}
+```
+
+Try 3
+
+```json
+{
+  "passed": true,
+  "selected_id": "lst_006",
+  "fit_card": "Get that effortless grunge look with this Graphic Tee — 2003 Tour Bootleg Style. Pair it with baggy straight-leg jeans and combat boots for the ultimate streetwear vibe. Grab this vintage find for just $24 on depop before it's gone!",
+  "error": null,
+  "calls": [
+    "search_listings (via MCP)",
+    "suggest_outfit",
+    "create_fit_card"
+  ],
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"vintage graphic tee\", \"size\": \"None\", \"max_price\": \"30.0\"}\n      out: 10 listings [{\"id\": \"lst_006\", \"title\": \"Graphic Tee — 2003 Tour Bootleg Style\"}, {\"id\": \"lst_033\", \"title\": \"Vintage Band Tee — Faded Grey\"}, {\"id\": \"lst_015\", \"title\": \"Vintage Graphic Hoodie — Faded Black\"}, {\"id\": \"lst_002\", \"title\": \"Y2K Baby Tee — Butterfly Print\"}, {\"id\": \"lst_012\", \"title\": \"Oversized Crewneck Sweatshirt — Vintage Navy\"}, {\"id\": \"lst_030\", \"title\": \"Vintage Knit Vest — Argyle Brown/Cream\"}, {\"id\": \"lst_024\", \"title\": \"Vintage Polo Shirt — Forest Green\"}, {\"id\": \"lst_003\", \"title\": \"Oversized Flannel Shirt — Plaid Red/Black\"}, {\"id\": \"lst_013\", \"title\": \"90s Silk Slip Dress — Floral, Midi Length\"}, {\"id\": \"lst_014\", \"title\": \"Leather Belt — Brown, Braided\"}]\n[2] suggest_outfit\n      in:  {\"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\", \"wardrobe\": \"{\\\"items\\\": \\\"10 items: {'id': 'w_001', 'name': 'Baggy straight-leg jeans, dark wash…\\\"}\"}\n      out: Pair the Graphic Tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for an eff…\n[3] create_fit_card\n      in:  {\"outfit\": \"Pair the Graphic Tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for an eff…\", \"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\"}\n      out: Get that effortless grunge look with this Graphic Tee — 2003 Tour Bootleg Style. Pair it with baggy straight-l…"
+}
+```
+
+Try 4
+
+```json
+{
+  "passed": true,
+  "selected_id": "lst_006",
+  "fit_card": "Just listed this Graphic Tee — 2003 Tour Bootleg Style on Depop for $24! It's giving total grunge vibes when paired with baggy straight-leg jeans, black combat boots, and a vintage black denim jacket. Grab it before it's gone!",
+  "error": null,
+  "calls": [
+    "search_listings (via MCP)",
+    "suggest_outfit",
+    "create_fit_card"
+  ],
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"vintage graphic tee\", \"size\": \"None\", \"max_price\": \"30.0\"}\n      out: 10 listings [{\"id\": \"lst_006\", \"title\": \"Graphic Tee — 2003 Tour Bootleg Style\"}, {\"id\": \"lst_033\", \"title\": \"Vintage Band Tee — Faded Grey\"}, {\"id\": \"lst_015\", \"title\": \"Vintage Graphic Hoodie — Faded Black\"}, {\"id\": \"lst_002\", \"title\": \"Y2K Baby Tee — Butterfly Print\"}, {\"id\": \"lst_012\", \"title\": \"Oversized Crewneck Sweatshirt — Vintage Navy\"}, {\"id\": \"lst_030\", \"title\": \"Vintage Knit Vest — Argyle Brown/Cream\"}, {\"id\": \"lst_024\", \"title\": \"Vintage Polo Shirt — Forest Green\"}, {\"id\": \"lst_003\", \"title\": \"Oversized Flannel Shirt — Plaid Red/Black\"}, {\"id\": \"lst_013\", \"title\": \"90s Silk Slip Dress — Floral, Midi Length\"}, {\"id\": \"lst_014\", \"title\": \"Leather Belt — Brown, Braided\"}]\n[2] suggest_outfit\n      in:  {\"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\", \"wardrobe\": \"{\\\"items\\\": \\\"10 items: {'id': 'w_001', 'name': 'Baggy straight-leg jeans, dark wash…\\\"}\"}\n      out: Pair your new Graphic Tee with baggy straight-leg jeans, dark wash and black combat boots for a classic grunge…\n[3] create_fit_card\n      in:  {\"outfit\": \"Pair your new Graphic Tee with baggy straight-leg jeans, dark wash and black combat boots for a classic grunge…\", \"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\"}\n      out: Just listed this Graphic Tee — 2003 Tour Bootleg Style on Depop for $24! It's giving total grunge vibes when p…"
+}
+```
+
+Try 5
+
+```json
+{
+  "passed": true,
+  "selected_id": "lst_006",
+  "fit_card": "Scored this vintage-style Graphic Tee on Depop for just $24. Pair it with baggy jeans, combat boots, and a crossbody bag for the ultimate grunge fit. Grab it before it’s gone! #graphictee #vintage #grunge #streetwear #bandtee",
+  "error": null,
+  "calls": [
+    "search_listings (via MCP)",
+    "suggest_outfit",
+    "create_fit_card"
+  ],
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"vintage graphic tee\", \"size\": \"None\", \"max_price\": \"30.0\"}\n      out: 10 listings [{\"id\": \"lst_006\", \"title\": \"Graphic Tee — 2003 Tour Bootleg Style\"}, {\"id\": \"lst_033\", \"title\": \"Vintage Band Tee — Faded Grey\"}, {\"id\": \"lst_015\", \"title\": \"Vintage Graphic Hoodie — Faded Black\"}, {\"id\": \"lst_002\", \"title\": \"Y2K Baby Tee — Butterfly Print\"}, {\"id\": \"lst_012\", \"title\": \"Oversized Crewneck Sweatshirt — Vintage Navy\"}, {\"id\": \"lst_030\", \"title\": \"Vintage Knit Vest — Argyle Brown/Cream\"}, {\"id\": \"lst_024\", \"title\": \"Vintage Polo Shirt — Forest Green\"}, {\"id\": \"lst_003\", \"title\": \"Oversized Flannel Shirt — Plaid Red/Black\"}, {\"id\": \"lst_013\", \"title\": \"90s Silk Slip Dress — Floral, Midi Length\"}, {\"id\": \"lst_014\", \"title\": \"Leather Belt — Brown, Braided\"}]\n[2] suggest_outfit\n      in:  {\"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\", \"wardrobe\": \"{\\\"items\\\": \\\"10 items: {'id': 'w_001', 'name': 'Baggy straight-leg jeans, dark wash…\\\"}\"}\n      out: Pair the Graphic Tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for a clas…\n[3] create_fit_card\n      in:  {\"outfit\": \"Pair the Graphic Tee with baggy straight-leg jeans, black combat boots, and the black crossbody bag for a clas…\", \"new_item\": \"{\\\"id\\\": \\\"lst_006\\\", \\\"title\\\": \\\"Graphic Tee — 2003 Tour Bootleg Style\\\", \\\"price\\\": 24.0, \\\"platform\\\": \\\"depop\\\"}\"}\n      out: Scored this vintage-style Graphic Tee on Depop for just $24. Pair it with baggy jeans, combat boots, and a cro…"
+}
+```
+
+### Criterion 2
+
+Try 1
+
+```json
+{
+  "passed": true,
+  "error": "No listings matched. Try a broader description, a different size, or a higher price ceiling.",
+  "outfit_calls": 0,
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"designer ballgown\", \"size\": \"XXS\", \"max_price\": \"5.0\"}\n      out: [] (empty)"
+}
+```
+
+Try 2
+
+```json
+{
+  "passed": true,
+  "error": "No listings matched. Try a broader description, a different size, or a higher price ceiling.",
+  "outfit_calls": 0,
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"designer ballgown\", \"size\": \"XXS\", \"max_price\": \"5.0\"}\n      out: [] (empty)"
+}
+```
+
+Try 3
+
+```json
+{
+  "passed": true,
+  "error": "No listings matched. Try a broader description, a different size, or a higher price ceiling.",
+  "outfit_calls": 0,
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"designer ballgown\", \"size\": \"XXS\", \"max_price\": \"5.0\"}\n      out: [] (empty)"
+}
+```
+
+Try 4
+
+```json
+{
+  "passed": true,
+  "error": "No listings matched. Try a broader description, a different size, or a higher price ceiling.",
+  "outfit_calls": 0,
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"designer ballgown\", \"size\": \"XXS\", \"max_price\": \"5.0\"}\n      out: [] (empty)"
+}
+```
+
+Try 5
+
+```json
+{
+  "passed": true,
+  "error": "No listings matched. Try a broader description, a different size, or a higher price ceiling.",
+  "outfit_calls": 0,
+  "trace": "[1] search_listings (via MCP)\n      in:  {\"description\": \"designer ballgown\", \"size\": \"XXS\", \"max_price\": \"5.0\"}\n      out: [] (empty)"
+}
+```
+
+### Criterion 3
+
+Try 1
+
+```json
+{
+  "passed": true,
+  "search_id": "lst_006",
+  "selected_id": "lst_006",
+  "outfit_arg_id": [
+    "lst_006"
+  ],
+  "error": null
+}
+```
+
+Try 2
+
+```json
+{
+  "passed": true,
+  "search_id": "lst_006",
+  "selected_id": "lst_006",
+  "outfit_arg_id": [
+    "lst_006"
+  ],
+  "error": null
+}
+```
+
+Try 3
+
+```json
+{
+  "passed": true,
+  "search_id": "lst_006",
+  "selected_id": "lst_006",
+  "outfit_arg_id": [
+    "lst_006"
+  ],
+  "error": null
+}
+```
+
+Try 4
+
+```json
+{
+  "passed": true,
+  "search_id": "lst_006",
+  "selected_id": "lst_006",
+  "outfit_arg_id": [
+    "lst_006"
+  ],
+  "error": null
+}
+```
+
+Try 5
+
+```json
+{
+  "passed": true,
+  "search_id": "lst_006",
+  "selected_id": "lst_006",
+  "outfit_arg_id": [
+    "lst_006"
+  ],
+  "error": null
+}
+```
+
+### Criterion 4
+
+Try 1
+
+```json
+{
+  "item_id": "lst_004",
+  "outfit": "Pair the 90s Track Jacket — Navy/White Stripe with the white ribbed tank top and baggy straight-leg jeans, finished with chunky white sneakers. Alternatively, layer it over the white ribbed tank top with the wide-leg khaki trousers and complete the look with chunky white sneakers.",
+  "card": "Channel effortless 90s streetwear by pairing this 90s Track Jacket — Navy/White Stripe with a white ribbed tank, baggy jeans, and chunky sneakers. It’s the ultimate vintage athletic piece for casual everyday style. Grab it on Poshmark for $45!",
+  "sentences": 3,
+  "title_count": 1,
+  "price_count": 1,
+  "platform_count": 1,
+  "passed": true
+}
+```
+
+Try 2
+
+```json
+{
+  "item_id": "lst_006",
+  "outfit": "Pair your new Graphic Tee with baggy straight-leg jeans, dark wash and black combat boots for an effortless grunge look. Alternatively, layer your vintage black denim jacket over the tee along with wide-leg khaki trousers and chunky white sneakers.",
+  "card": "Scored this 2003 Tour Bootleg Style Graphic Tee on Depop for just $24! Style it with baggy straight-leg jeans and black combat boots for an effortless grunge look. Grab this piece of streetwear before it's gone.",
+  "sentences": 3,
+  "title_count": 0,
+  "price_count": 1,
+  "platform_count": 1,
+  "passed": false
+}
+```
+
+Try 3
+
+```json
+{
+  "item_id": "lst_007",
+  "outfit": "Pair the new Denim Jacket with the white ribbed tank top, wide-leg khaki trousers, and chunky white sneakers. Alternatively, layer the new Denim Jacket over the oversized grey crewneck sweatshirt with the baggy straight-leg jeans, dark wash and black combat boots.",
+  "card": "Obsessed with this classic Denim Jacket — Light Wash, Cropped. Pair it with a white ribbed tank, khaki trousers, and chunky sneakers for an easy streetwear vibe. Grab it now on Poshmark for just $42!",
+  "sentences": 3,
+  "title_count": 1,
+  "price_count": 1,
+  "platform_count": 1,
+  "passed": true
+}
+```
+
+Try 4
+
+```json
+{
+  "item_id": "lst_013",
+  "outfit": "Layer the 90s Silk Slip Dress over the white ribbed tank top and finish the look with the chunky white sneakers and the black crossbody bag. For a cool, grunge-inspired contrast, wear the dress beneath the oversized grey crewneck sweatshirt and anchor the outfit with the black combat boots.",
+  "card": "Layer this floral 90s Silk Slip Dress over a white ribbed tank and chunky sneakers for the ultimate vintage look, or toughen it up with combat boots and an oversized crewneck. Grab it on Depop for just $30!",
+  "sentences": 2,
+  "title_count": 0,
+  "price_count": 1,
+  "platform_count": 1,
+  "passed": false
+}
+```
+
+Try 5
+
+```json
+{
+  "item_id": "lst_019",
+  "outfit": "Pair your new Platform Sneakers — White Chunky Sole with the baggy straight-leg jeans, dark wash and the white ribbed tank top. Throw on the vintage black denim jacket and the black crossbody bag to complete the streetwear look.",
+  "card": "Channel major Y2K streetwear vibes with these Platform Sneakers — White Chunky Sole. Just style them with baggy straight-leg jeans, a ribbed tank, a vintage denim jacket, and a black crossbody. Grab them on Poshmark for $48!",
+  "sentences": 3,
+  "title_count": 1,
+  "price_count": 1,
+  "platform_count": 1,
+  "passed": true
+}
+```
+
+### Criterion 5
+
+Try 1
+
+```json
+{
+  "passed": true,
+  "query": "graphic tee size L under $25",
+  "results": [
+    {
+      "id": "lst_006",
+      "size": "L",
+      "price": 24.0
+    },
+    {
+      "id": "lst_033",
+      "size": "L",
+      "price": 19.0
+    }
+  ]
+}
+```
+
+Try 2
+
+```json
+{
+  "passed": true,
+  "query": "track jacket size M under $50",
+  "results": [
+    {
+      "id": "lst_004",
+      "size": "M",
+      "price": 45.0
+    },
+    {
+      "id": "lst_032",
+      "size": "M/L",
+      "price": 33.0
+    }
+  ]
+}
+```
+
+Try 3
+
+```json
+{
+  "passed": true,
+  "query": "platform sneakers size 8 under $50",
+  "results": [
+    {
+      "id": "lst_019",
+      "size": "US 8",
+      "price": 48.0
+    }
+  ]
+}
+```
+
+Try 4
+
+```json
+{
+  "passed": true,
+  "query": "denim jacket size S under $50",
+  "results": [
+    {
+      "id": "lst_007",
+      "size": "S",
+      "price": 42.0
+    }
+  ]
+}
+```
+
+Try 5
+
+```json
+{
+  "passed": true,
+  "query": "silk slip dress size M under $40",
+  "results": [
+    {
+      "id": "lst_013",
+      "size": "M",
+      "price": 30.0
+    },
+    {
+      "id": "lst_029",
+      "size": "M",
+      "price": 28.0
+    }
+  ]
+}
+```
