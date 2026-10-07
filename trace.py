@@ -26,16 +26,19 @@ in the step name — `search_listings (via MCP)` is enough.
 """
 
 import config
+import json
 
 _lines: list[str] = []
 _step_number = 0
+_enabled = False
 
 
 def start_trace() -> None:
     """Clear the trace. Call this at the start of each run."""
-    global _step_number
+    global _step_number, _enabled
     _lines.clear()
     _step_number = 0
+    _enabled = True
 
 
 def step(name: str, inputs=None, returned=None, note: str = "") -> None:
@@ -50,6 +53,8 @@ def step(name: str, inputs=None, returned=None, note: str = "") -> None:
         note:     an optional word on why, e.g. "branch: empty, stopping".
     """
     global _step_number
+    if not _enabled:
+        return
     _step_number += 1
 
     line = f"[{_step_number}] {name}"
@@ -76,16 +81,19 @@ def _short(value, limit: int = 110) -> str:
             return "[] (empty)"
         head = value[0]
         if isinstance(head, dict) and "title" in head:
-            titles = ", ".join(str(v.get("title", "?")) for v in value[:3])
-            more = f" … +{len(value) - 3} more" if len(value) > 3 else ""
-            return f"{len(value)} items: {titles}{more}"
+            return f"{len(value)} listings " + json.dumps(
+                [{"id": v.get("id"), "title": v.get("title")} for v in value],
+                ensure_ascii=False,
+            )
         return f"{len(value)} items: {str(head)[:60]}…"
 
     if isinstance(value, dict):
         if "title" in value:
-            return f"{value.get('title')} (${value.get('price')}, {value.get('platform')})"
-        keys = ", ".join(list(value)[:6])
-        return f"dict with keys: {keys}"
+            return json.dumps({"id": value.get("id"), "title": value.get("title"),
+                               "price": value.get("price"), "platform": value.get("platform")},
+                              ensure_ascii=False)
+        return json.dumps({key: _short(item, limit) for key, item in value.items()},
+                          ensure_ascii=False)
 
     text = str(value).replace("\n", " ")
     return text if len(text) <= limit else text[:limit] + "…"

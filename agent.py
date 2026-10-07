@@ -14,7 +14,8 @@ import re
 
 import config
 import trace
-from tools import search_listings, suggest_outfit, create_fit_card
+from tools import suggest_outfit, create_fit_card
+from mcp_client import MCPError, call_tool
 from generate import ModelUnavailable
 
 
@@ -104,9 +105,13 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
         if next_step == "search":
             parsed = session["parsed"]
-            session["search_results"] = search_listings(
-                parsed["description"], parsed["size"], parsed["max_price"]
-            )
+            try:
+                session["search_results"] = call_tool("search_listings", parsed)
+            except MCPError as exc:
+                trace.step("search_listings (via MCP)", inputs=parsed, returned=str(exc))
+                session["error"] = "Search is unavailable. Please try again shortly."
+                return session
+            trace.step("search_listings (via MCP)", inputs=parsed, returned=session["search_results"])
             if not session["search_results"]:
                 session["error"] = (
                     "No listings matched. Try a broader description, "
@@ -116,14 +121,28 @@ def run_agent(query: str, wardrobe: dict) -> dict:
             session["selected_item"] = session["search_results"][0]
             next_step = "outfit"
         elif next_step == "outfit":
-            session["outfit_suggestion"] = suggest_outfit(
-                session["selected_item"], session["wardrobe"]
-            )
+            outfit_inputs = {"new_item": session["selected_item"], "wardrobe": session["wardrobe"]}
+            try:
+                session["outfit_suggestion"] = suggest_outfit(
+                    session["selected_item"], session["wardrobe"]
+                )
+            except ModelUnavailable as exc:
+                trace.step("suggest_outfit", inputs=outfit_inputs, returned=str(exc))
+                session["error"] = "The model could not be reached for an outfit suggestion. Check your connection and try again."
+                return session
+            trace.step("suggest_outfit", inputs=outfit_inputs, returned=session["outfit_suggestion"])
             next_step = "fit_card"
         elif next_step == "fit_card":
-            session["fit_card"] = create_fit_card(
-                session["outfit_suggestion"], session["selected_item"]
-            )
+            card_inputs = {"outfit": session["outfit_suggestion"], "new_item": session["selected_item"]}
+            try:
+                session["fit_card"] = create_fit_card(
+                    session["outfit_suggestion"], session["selected_item"]
+                )
+            except ModelUnavailable as exc:
+                trace.step("create_fit_card", inputs=card_inputs, returned=str(exc))
+                session["error"] = "The model could not be reached for a fit card. Check your connection and try again."
+                return session
+            trace.step("create_fit_card", inputs=card_inputs, returned=session["fit_card"])
             next_step = None
 
     return session
